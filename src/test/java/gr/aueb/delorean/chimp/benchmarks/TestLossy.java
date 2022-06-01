@@ -23,7 +23,7 @@ import gr.aueb.delorean.chimp.SwingFilter.SwingSegment;
  * the value compression.
  *
  */
-public class CompressBenchmarkLossy {
+public class TestLossy {
 
 	private static final int MINIMUM_TOTAL_BLOCKS = 50_000;
 	private static String[] FILENAMES = {

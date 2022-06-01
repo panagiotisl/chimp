@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -33,12 +31,14 @@ import gr.aueb.delorean.chimp.Compressor32;
 import gr.aueb.delorean.chimp.Decompressor32;
 import gr.aueb.delorean.chimp.Value;
 
+
+
 /**
  * These are generic tests to test that input matches the output after compression + decompression cycle, using
  * the value compression.
  *
  */
-public class CompressBenchmarkSinglePrecision {
+public class TestSinglePrecision {
 
 	private static final int MINIMUM_TOTAL_BLOCKS = 50_000;
 	private static String[] FILENAMES = {
@@ -46,6 +46,8 @@ public class CompressBenchmarkSinglePrecision {
 	        "/Stocks-Germany-sample.txt.gz",
 	        "/SSD_HDD_benchmarks.csv.gz"
 			};
+
+
 
 	@Test
     public void testChimpN32() throws IOException {
@@ -129,7 +131,7 @@ public class CompressBenchmarkSinglePrecision {
 	@Test
     public void testCorilla32() throws IOException {
         for (String filename : FILENAMES) {
-            TimeseriesFileReader timeseriesFileReader = new TimeseriesFileReader(new FileInputStream(new File(filename)));
+            TimeseriesFileReader timeseriesFileReader = new TimeseriesFileReader(getClass().getResourceAsStream(filename));
             long totalSize = 0;
             float totalBlocks = 0;
             double[] values;
@@ -137,7 +139,7 @@ public class CompressBenchmarkSinglePrecision {
             long decodingDuration = 0;
             while ((values = timeseriesFileReader.nextBlock()) != null || totalBlocks < MINIMUM_TOTAL_BLOCKS) {
                 if (values == null) {
-                    timeseriesFileReader = new TimeseriesFileReader(new FileInputStream(new File(filename)));
+                    timeseriesFileReader = new TimeseriesFileReader(getClass().getResourceAsStream(filename));
                     values = timeseriesFileReader.nextBlock();
                 }
                 ByteBufferBitOutput output = new ByteBufferBitOutput();

@@ -39,7 +39,7 @@ import gr.aueb.delorean.chimp.ChimpNNoIndex;
  * the value compression.
  *
  */
-public class CompressBenchmark {
+public class TestDoublePrecision {
 
 	private static final int MINIMUM_TOTAL_BLOCKS = 50_000;
 	private static String[] FILENAMES = {
