@@ -17,7 +17,7 @@ package gr.aueb.delorean.chimp;
 public class LinearFunction {
 
     /** Constructors **/
-    public LinearFunction(long ts, float vs, long te, float ve) {
+    public LinearFunction(long ts, double vs, long te, double ve) {
         this.a = (ve - vs) / (te - ts);
         this.b = vs - a * ts;
     }
@@ -32,6 +32,6 @@ public class LinearFunction {
 
     @Override
     public String toString() {
-    	return String.format("%fx+%f", a, b);
+    	return String.format("%.15fx+%f", a, b);
     }
 }

@@ -16,7 +16,7 @@ import gr.aueb.delorean.chimp.PmcMR;
 import gr.aueb.delorean.chimp.PmcMR.Constant;
 import gr.aueb.delorean.chimp.Point;
 import gr.aueb.delorean.chimp.SwingFilter;
-import gr.aueb.delorean.chimp.SwingFilter.SwingSegment;
+import gr.aueb.delorean.chimp.SwingSegment;
 
 /**
  * These are generic tests to test that input matches the output after compression + decompression cycle, using
@@ -58,7 +58,7 @@ public class TestLossy {
                     List<Constant> constants = new PmcMR().filter(points, ((float) Math.pow(2, logOfError)));
                     encodingDuration += System.nanoTime() - start;
 
-                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> l.getValue()).collect(Collectors.toList()));
+                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> (float) l.getValue()).collect(Collectors.toList()));
                     totalBlocks += 1;
                     totalSize += constants.size() * 2 * 32;
 
@@ -75,7 +75,7 @@ public class TestLossy {
                     }
                 }
                 System.out.println(String.format(
-                        "Swing: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
+                        "PMC-MR: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
                         filename, totalSize / (totalBlocks * TimeseriesFileReader.DEFAULT_BLOCK_SIZE),
                         encodingDuration / totalBlocks, decodingDuration / totalBlocks, maxPrecisionError, totalStdev / totalBlocks, maxPrecisionError / (totalStdev / totalBlocks), (maxValue - minValue), 100* maxPrecisionError / (maxValue - minValue)));
 
@@ -94,7 +94,7 @@ public class TestLossy {
                 double minValue = Double.MAX_VALUE;
                 int timestamp = 0;
                 double maxPrecisionError = 0;
-                long totalSize = 0;
+                long totalSize = 32;
                 float totalBlocks = 0;
                 double totalStdev = 0D;
                 long encodingDuration = 0;
@@ -106,12 +106,12 @@ public class TestLossy {
                     }
 
                     long start = System.nanoTime();
-                    List<SwingSegment> constants = new SwingFilter().filter(points, ((float) Math.pow(2, logOfError)));
+                    List<SwingSegment> constants = new SwingFilter().filter(points, (float) (Math.pow(2, logOfError)));
                     encodingDuration += System.nanoTime() - start;
 
-                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> l.getValue()).collect(Collectors.toList()));
+                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> (float) l.getValue()).collect(Collectors.toList()));
                     totalBlocks += 1;
-                    totalSize += constants.size() * ( 2 * 64 + 32);
+                    totalSize += constants.size() * (2 * 32);
 
                     DecompressorSwingFilter d = new DecompressorSwingFilter(constants);
                     for (Double value : values) {
@@ -122,7 +122,8 @@ public class TestLossy {
                         decodingDuration += System.nanoTime() - start;
                         double precisionError = Math.abs(value.doubleValue() - decompressedValue);
                         maxPrecisionError = (precisionError > maxPrecisionError) ? precisionError : maxPrecisionError;
-                      assertEquals(value.floatValue(), decompressedValue.floatValue(), ((float) Math.pow(2, logOfError)), "Value did not match");
+//                        System.out.println(value.floatValue() + "\t" + decompressedValue.floatValue());
+                        assertEquals(value.floatValue(), decompressedValue.floatValue(), ((float) Math.pow(2, logOfError)+0.00001), "Value did not match");
                     }
                 }
                 System.out.println(String.format(

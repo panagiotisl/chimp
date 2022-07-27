@@ -2,8 +2,6 @@ package gr.aueb.delorean.chimp;
 
 import java.util.List;
 
-import gr.aueb.delorean.chimp.SwingFilter.SwingSegment;
-
 public class DecompressorSwingFilter {
 
 	private List<SwingSegment> swingSegments;
@@ -32,13 +30,14 @@ public class DecompressorSwingFilter {
     private void next() {
     	SwingSegment swingSegment = swingSegments.get(currentElement);
     	if (swingSegment.getFinalTimestamp() >= (swingSegment.getInitialTimestamp() + currentTimestampOffset)) {
-    		storedVal = swingSegment.getLine().get(swingSegment.getInitialTimestamp() + currentTimestampOffset);
+    		storedVal = (float) swingSegment.getLine().get(swingSegment.getInitialTimestamp() + currentTimestampOffset);
+//    		System.out.println("LineDec: " + swingSegment.getLine() + "\t" + (swingSegment.getInitialTimestamp() + currentTimestampOffset) + "\t" + storedVal);
     		currentTimestampOffset++;
     	} else {
     		currentElement++;
     		if (currentElement < swingSegments.size()) {
     			swingSegment = swingSegments.get(currentElement);
-    			storedVal = swingSegment.getLine().get(swingSegment.getInitialTimestamp());
+    			storedVal = (float) swingSegment.getLine().get(swingSegment.getInitialTimestamp());
 
     			currentTimestampOffset = 1;
     		} else {
