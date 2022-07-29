@@ -27,7 +27,6 @@ public class SwingFilter {
         while (true) {
             if (!iterator.hasNext()) {
                 if (uiOld != null && liOld != null) {
-//                  System.out.println("need to start new line");
                     LinearFunction line = new LinearFunction(first.getTimestamp(), first.getValue(),
                             current.getTimestamp(),
                             (uiOld.get(current.getTimestamp()) + liOld.get(current.getTimestamp())) / 2);
@@ -39,24 +38,20 @@ public class SwingFilter {
             }
             previous = current;
             current = iterator.next();
-//            System.out.println("Points: " + first.getValue() + "\t" + previous.getValue() + "\t" + current.getValue() + "\t" + uiOld + "\t" + liOld);
             if (uiOld.get(current.getTimestamp()) < current.getValue() - epsilon
                     || liOld.get(current.getTimestamp()) > current.getValue() + epsilon) {
-//                System.out.println("need to start new line: " + first.getValue() + "\t" + (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2 + "\t" + line + "\t" + previous.getTimestamp());
-                swingSegments.add(new SwingSegment(first.getTimestamp(), previous.getTimestamp() - 1, first.getValue(), (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2));
-//                swingSegments.add(new SwingSegment(first.getTimestamp(), previous.getTimestamp() - 1, first.getValue(), (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2));
-                previous = first = new Point(previous.getTimestamp(), (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2);
+                Point newPoint = new Point(previous.getTimestamp(), (float) (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2);
+                swingSegments.add(new SwingSegment(first.getTimestamp(), previous.getTimestamp() - 1, first.getValue(), newPoint.getValue()));
+                previous = first = newPoint;
                 uiOld = new LinearFunction(previous.getTimestamp(), previous.getValue(), current.getTimestamp(),
                         current.getValue() + epsilon);
                 liOld = new LinearFunction(previous.getTimestamp(), previous.getValue(), current.getTimestamp(),
                         current.getValue() - epsilon);
-//                System.out.println("New range: " + current.getValue() + "\t" + current.getTimestamp() + "\t" + uiOld + "\t" + liOld);
             } else {
                 LinearFunction uiNew = new LinearFunction(first.getTimestamp(), first.getValue(),
                         current.getTimestamp(), current.getValue() + epsilon);
                 LinearFunction liNew = new LinearFunction(first.getTimestamp(), first.getValue(),
                         current.getTimestamp(), current.getValue() - epsilon);
-//                System.out.println("Cand: " + current.getValue() + "\t" + current.getTimestamp() + "\t" + uiNew + "\t" + liNew);
                 if (uiOld == null || uiOld.get(current.getTimestamp()) > uiNew.get(current.getTimestamp())) {
                     uiOld = uiNew;
                 }

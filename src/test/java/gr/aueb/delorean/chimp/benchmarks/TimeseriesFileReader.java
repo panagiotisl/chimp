@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -37,19 +38,19 @@ public class TimeseriesFileReader {
 						values[counter++] = value;
 						if (counter == blocksize) {
 							return values;
-						}	
+						}
 					} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 						continue;
 					}
-					
+
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return null;
 		}
-		
-		
+
+
 		public float[] nextBlock32() {
 			float[] values = new float[DEFAULT_BLOCK_SIZE];
 			String line;
@@ -61,17 +62,40 @@ public class TimeseriesFileReader {
 						values[counter++] = value;
 						if (counter == blocksize) {
 							return values;
-						}	
+						}
 					} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 						continue;
 					}
-					
+
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return null;
 		}
+
+		public BigDecimal[] nextBlockBigDecimal() {
+		    BigDecimal[] values = new BigDecimal[DEFAULT_BLOCK_SIZE];
+            String line;
+            int counter = 0;
+            try {
+                while ((line = bufferedReader.readLine()) != null) {
+                    try {
+                        BigDecimal value = new BigDecimal(line.split(DELIMITER)[VALUE_POSITION]);
+                        values[counter++] = value;
+                        if (counter == blocksize) {
+                            return values;
+                        }
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                        continue;
+                    }
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
 
 	    public static double mean (List<Float> table)
 	    {
@@ -85,10 +109,10 @@ public class TimeseriesFileReader {
 	        return total/table.size();
 	    }
 
-		
+
 		public static double sd (List<Float> list)
 		{
-		    // Step 1: 
+		    // Step 1:
 		    double mean = mean(list);
 //		    System.out.println("Mean: " + mean + ", Media: " + list.get(list.size()/2));
 		    double temp = 0;
@@ -105,11 +129,11 @@ public class TimeseriesFileReader {
 		    }
 
 		    // Step 4:
-		    double meanOfDiffs = (double) temp / (double) (list.size());
+		    double meanOfDiffs = temp / (list.size());
 
 		    // Step 5:
 		    return Math.sqrt(meanOfDiffs);
 		}
 
-		
+
 	}

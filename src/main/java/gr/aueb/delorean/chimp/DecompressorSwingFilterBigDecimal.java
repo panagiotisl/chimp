@@ -1,17 +1,18 @@
 package gr.aueb.delorean.chimp;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public class DecompressorSwingFilter {
+public class DecompressorSwingFilterBigDecimal {
 
-	private List<SwingSegment> swingSegments;
-    private float storedVal = 0f;
+	private List<SwingSegmentBigDecimal> swingSegments;
+    private BigDecimal storedVal = new BigDecimal(0);
     private boolean endOfStream = false;
     private int currentElement = 0;
     private int currentTimestampOffset = 0;
 
-    public DecompressorSwingFilter(List<SwingSegment> swingSegments) {
-    	this.swingSegments = swingSegments;
+    public DecompressorSwingFilterBigDecimal(List<SwingSegmentBigDecimal> constants) {
+    	this.swingSegments = constants;
     }
 
     /**
@@ -19,7 +20,7 @@ public class DecompressorSwingFilter {
      *
      * @return Pair if there's next value, null if series is done.
      */
-    public Float readValue() {
+    public BigDecimal readValue() {
         next();
         if(endOfStream) {
             return null;
@@ -28,15 +29,16 @@ public class DecompressorSwingFilter {
     }
 
     private void next() {
-    	SwingSegment swingSegment = swingSegments.get(currentElement);
+    	SwingSegmentBigDecimal swingSegment = swingSegments.get(currentElement);
     	if (swingSegment.getFinalTimestamp() >= (swingSegment.getInitialTimestamp() + currentTimestampOffset)) {
-    		storedVal = (float) swingSegment.getLine().get(swingSegment.getInitialTimestamp() + currentTimestampOffset);
+    		storedVal = swingSegment.getLine().get(swingSegment.getInitialTimestamp() + currentTimestampOffset);
+//    		System.out.println("LineDec: " + swingSegment.getLine() + "\t" + (swingSegment.getInitialTimestamp() + currentTimestampOffset) + "\t" + storedVal);
     		currentTimestampOffset++;
     	} else {
     		currentElement++;
     		if (currentElement < swingSegments.size()) {
     			swingSegment = swingSegments.get(currentElement);
-    			storedVal = (float) swingSegment.getLine().get(swingSegment.getInitialTimestamp());
+    			storedVal = swingSegment.getLine().get(swingSegment.getInitialTimestamp());
 
     			currentTimestampOffset = 1;
     		} else {

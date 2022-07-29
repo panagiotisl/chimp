@@ -14,46 +14,32 @@
  */
 package gr.aueb.delorean.chimp;
 
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
-public class LinearFunction {
+public class LinearFunctionBigDecimal {
+
+    MathContext mc = new MathContext(30, RoundingMode.HALF_UP) ;
 
     /** Constructors **/
-    public LinearFunction(long ts, double vs, long te, double ve) {
-        this.a = (ve - vs) / (te - ts);
-        this.b = vs - a * ts;
+    public LinearFunctionBigDecimal(long ts, BigDecimal vs, long te, BigDecimal ve) {
+        this.a = ve.subtract(vs).divide(new BigDecimal(te - ts), mc);
+        this.b = vs.subtract(a.multiply(new BigDecimal(ts)));
     }
 
     /** Public Methods **/
-    public double get(long ts) {
-        return (this.a * ts + this.b);
+    public BigDecimal get(long ts) {
+        return (this.a.multiply(new BigDecimal(ts)).add(b));
     }
 
+    private BigDecimal a;
     /** Instance Variables **/
-    public final double a, b;
+    private BigDecimal b;
 
     @Override
     public String toString() {
     	return String.format("%.15fx+%f", a, b);
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(a, b);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        LinearFunction other = (LinearFunction) obj;
-        return Double.doubleToLongBits(a) == Double.doubleToLongBits(other.a)
-                && Double.doubleToLongBits(b) == Double.doubleToLongBits(other.b);
-    }
-
 
 }
