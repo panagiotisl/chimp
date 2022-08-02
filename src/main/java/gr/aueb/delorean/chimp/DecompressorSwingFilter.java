@@ -9,9 +9,11 @@ public class DecompressorSwingFilter {
     private boolean endOfStream = false;
     private int currentElement = 0;
     private int currentTimestampOffset = 0;
+    private SwingSegment swingSegment;
 
     public DecompressorSwingFilter(List<SwingSegment> swingSegments) {
     	this.swingSegments = swingSegments;
+    	this.swingSegment = swingSegments.get(currentElement);
     }
 
     /**
@@ -28,7 +30,6 @@ public class DecompressorSwingFilter {
     }
 
     private void next() {
-    	SwingSegment swingSegment = swingSegments.get(currentElement);
     	if (swingSegment.getFinalTimestamp() >= (swingSegment.getInitialTimestamp() + currentTimestampOffset)) {
     		storedVal = (float) swingSegment.getLine().get(swingSegment.getInitialTimestamp() + currentTimestampOffset);
     		currentTimestampOffset++;

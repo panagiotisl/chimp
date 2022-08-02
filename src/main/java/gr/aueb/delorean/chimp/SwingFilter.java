@@ -32,7 +32,9 @@ public class SwingFilter {
                             (uiOld.get(current.getTimestamp()) + liOld.get(current.getTimestamp())) / 2);
                     swingSegments.add(new SwingSegment(first.getTimestamp(), current.getTimestamp(), line));
                 } else {
-                    swingSegments.add(new SwingSegment(first.getTimestamp(), first.getTimestamp(), first.getValue(), first.getValue()));
+                	LinearFunction line = new LinearFunction(first.getTimestamp(), first.getValue(),
+                            first.getTimestamp() + 1, first.getValue());
+                    swingSegments.add(new SwingSegment(first.getTimestamp(), first.getTimestamp(), line));
                 }
                 return swingSegments;
             }
@@ -40,9 +42,11 @@ public class SwingFilter {
             current = iterator.next();
             if (uiOld.get(current.getTimestamp()) < current.getValue() - epsilon
                     || liOld.get(current.getTimestamp()) > current.getValue() + epsilon) {
-                Point newPoint = new Point(previous.getTimestamp(), (float) (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2);
-                swingSegments.add(new SwingSegment(first.getTimestamp(), previous.getTimestamp() - 1, first.getValue(), newPoint.getValue()));
-                previous = first = newPoint;
+
+            	LinearFunction line = new LinearFunction(first.getTimestamp(), first.getValue(),
+                        previous.getTimestamp(), (uiOld.get(previous.getTimestamp()) + liOld.get(previous.getTimestamp())) / 2);
+                swingSegments.add(new SwingSegment(first.getTimestamp(), previous.getTimestamp() - 1, line));
+                previous = first = new Point(previous.getTimestamp(), (float) line.get(previous.getTimestamp()));
                 uiOld = new LinearFunction(previous.getTimestamp(), previous.getValue(), current.getTimestamp(),
                         current.getValue() + epsilon);
                 liOld = new LinearFunction(previous.getTimestamp(), previous.getValue(), current.getTimestamp(),
