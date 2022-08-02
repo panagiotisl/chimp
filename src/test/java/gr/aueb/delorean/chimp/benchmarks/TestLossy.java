@@ -3,7 +3,6 @@ package gr.aueb.delorean.chimp.benchmarks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,12 +12,10 @@ import org.junit.jupiter.api.Test;
 
 import gr.aueb.delorean.chimp.DecompressorPmcMr;
 import gr.aueb.delorean.chimp.DecompressorSwingFilter;
-import gr.aueb.delorean.chimp.LinearFunctionBigDecimal;
 import gr.aueb.delorean.chimp.PmcMR;
 import gr.aueb.delorean.chimp.PmcMR.Constant;
 import gr.aueb.delorean.chimp.Point;
 import gr.aueb.delorean.chimp.SwingFilter;
-import gr.aueb.delorean.chimp.SwingFilterDisjoint;
 import gr.aueb.delorean.chimp.SwingSegment;
 
 /**
@@ -87,62 +84,6 @@ public class TestLossy {
         }
     }
 
-	/*
-	@Test
-    public void testSwingBigDecimal() throws IOException {
-        BigDecimal[] epsilons = {new BigDecimal("0.25"), new BigDecimal("0.5")};
-        for (String filename : FILENAMES) {
-            for (BigDecimal epsilon : epsilons) {
-                TimeseriesFileReader timeseriesFileReader = new TimeseriesFileReader(getClass().getResourceAsStream(filename));
-                BigDecimal[] values;
-                BigDecimal maxValue = new BigDecimal(Double.MIN_VALUE);
-                BigDecimal minValue = new BigDecimal(Double.MAX_VALUE);
-                int timestamp = 0;
-                double maxPrecisionError = 0;
-                long totalSize = 32;
-                float totalBlocks = 0;
-                double totalStdev = 0D;
-                long encodingDuration = 0;
-                long decodingDuration = 0;
-                while ((values = timeseriesFileReader.nextBlockBigDecimal()) != null && totalBlocks < MINIMUM_TOTAL_BLOCKS) {
-                    Collection<PointBigDecimal> points = new ArrayList<>();
-                    for (BigDecimal value : values) {
-                        points.add(new PointBigDecimal(timestamp++, value));
-                    }
-
-                    long start = System.nanoTime();
-                    List<SwingSegmentBigDecimal> constants = new SwingFilterBigDecimal().filter(points, epsilon);
-                    encodingDuration += System.nanoTime() - start;
-
-                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> l.getValue().floatValue()).collect(Collectors.toList()));
-                    totalBlocks += 1;
-                    totalSize += constants.size() * (2 * 32);
-
-                    DecompressorSwingFilterBigDecimal d = new DecompressorSwingFilterBigDecimal(constants);
-                    for (BigDecimal value : values) {
-                        start = System.nanoTime();
-                        maxValue = value.compareTo(maxValue) > 0 ? value : maxValue;
-                        minValue = value.compareTo(minValue) < 0 ? value : minValue;
-                        BigDecimal decompressedValue = d.readValue();
-                        decodingDuration += System.nanoTime() - start;
-                        double precisionError = Math.abs(value.doubleValue() - decompressedValue.doubleValue());
-                        maxPrecisionError = (precisionError > maxPrecisionError) ? precisionError : maxPrecisionError;
-                        System.out.println(value.floatValue() + "\t" + decompressedValue.floatValue() + "\t" + epsilon + "\t" + (value.floatValue()+ epsilon.floatValue() >= decompressedValue.floatValue()));
-                        assertTrue(value.add(epsilon).compareTo(decompressedValue) > 0, "Value did not match");
-                        assertTrue(value.subtract(epsilon).compareTo(decompressedValue) < 0, "Value did not match");
-                    }
-                }
-                System.out.println(String.format(
-                        "Swing: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
-                        filename, totalSize / (totalBlocks * TimeseriesFileReader.DEFAULT_BLOCK_SIZE),
-                        encodingDuration / totalBlocks, decodingDuration / totalBlocks, maxPrecisionError, totalStdev / totalBlocks, maxPrecisionError / (totalStdev / totalBlocks), (maxValue.subtract(minValue)), 100* maxPrecisionError / (maxValue.subtract(minValue).doubleValue())));
-
-            }
-        }
-    }
-	 */
-
-
 	@Test
     public void testSwing() throws IOException {
 
@@ -196,6 +137,60 @@ public class TestLossy {
     }
 
 
+	/*
+	@Test
+    public void testSwingBigDecimal() throws IOException {
+        BigDecimal[] epsilons = {new BigDecimal("0.25"), new BigDecimal("0.5")};
+        for (String filename : FILENAMES) {
+            for (BigDecimal epsilon : epsilons) {
+                TimeseriesFileReader timeseriesFileReader = new TimeseriesFileReader(getClass().getResourceAsStream(filename));
+                BigDecimal[] values;
+                BigDecimal maxValue = new BigDecimal(Double.MIN_VALUE);
+                BigDecimal minValue = new BigDecimal(Double.MAX_VALUE);
+                int timestamp = 0;
+                double maxPrecisionError = 0;
+                long totalSize = 32;
+                float totalBlocks = 0;
+                double totalStdev = 0D;
+                long encodingDuration = 0;
+                long decodingDuration = 0;
+                while ((values = timeseriesFileReader.nextBlockBigDecimal()) != null && totalBlocks < MINIMUM_TOTAL_BLOCKS) {
+                    Collection<PointBigDecimal> points = new ArrayList<>();
+                    for (BigDecimal value : values) {
+                        points.add(new PointBigDecimal(timestamp++, value));
+                    }
+
+                    long start = System.nanoTime();
+                    List<SwingSegmentBigDecimal> constants = new SwingFilterBigDecimal().filter(points, epsilon);
+                    encodingDuration += System.nanoTime() - start;
+
+                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> l.getValue().floatValue()).collect(Collectors.toList()));
+                    totalBlocks += 1;
+                    totalSize += constants.size() * (2 * 32);
+
+                    DecompressorSwingFilterBigDecimal d = new DecompressorSwingFilterBigDecimal(constants);
+                    for (BigDecimal value : values) {
+                        start = System.nanoTime();
+                        maxValue = value.compareTo(maxValue) > 0 ? value : maxValue;
+                        minValue = value.compareTo(minValue) < 0 ? value : minValue;
+                        BigDecimal decompressedValue = d.readValue();
+                        decodingDuration += System.nanoTime() - start;
+                        double precisionError = Math.abs(value.doubleValue() - decompressedValue.doubleValue());
+                        maxPrecisionError = (precisionError > maxPrecisionError) ? precisionError : maxPrecisionError;
+                        System.out.println(value.floatValue() + "\t" + decompressedValue.floatValue() + "\t" + epsilon + "\t" + (value.floatValue()+ epsilon.floatValue() >= decompressedValue.floatValue()));
+                        assertTrue(value.add(epsilon).compareTo(decompressedValue) > 0, "Value did not match");
+                        assertTrue(value.subtract(epsilon).compareTo(decompressedValue) < 0, "Value did not match");
+                    }
+                }
+                System.out.println(String.format(
+                        "Swing: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
+                        filename, totalSize / (totalBlocks * TimeseriesFileReader.DEFAULT_BLOCK_SIZE),
+                        encodingDuration / totalBlocks, decodingDuration / totalBlocks, maxPrecisionError, totalStdev / totalBlocks, maxPrecisionError / (totalStdev / totalBlocks), (maxValue.subtract(minValue)), 100* maxPrecisionError / (maxValue.subtract(minValue).doubleValue())));
+
+            }
+        }
+    }
+
     @Test
     public void testSwingD() throws IOException {
 
@@ -240,7 +235,7 @@ public class TestLossy {
                     }
                 }
                 System.out.println(String.format(
-                        "Swing: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
+                        "SwingD: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
                         filename, totalSize / (totalBlocks * TimeseriesFileReader.DEFAULT_BLOCK_SIZE),
                         encodingDuration / totalBlocks, decodingDuration / totalBlocks, maxPrecisionError, totalStdev / totalBlocks, maxPrecisionError / (totalStdev / totalBlocks), (maxValue - minValue), 100* maxPrecisionError / (maxValue - minValue)));
 
@@ -248,22 +243,57 @@ public class TestLossy {
         }
     }
 
+    @Test
+    public void testSwingDQ() throws IOException {
 
+        for (String filename : FILENAMES) {
+            for (int logOfError = -7; logOfError < 12; logOfError++) {
+            	float epsilon = (float) Math.pow(2, logOfError);
+                TimeseriesFileReader timeseriesFileReader = new TimeseriesFileReader(getClass().getResourceAsStream(filename));
+                double[] values;
+                double maxValue = Double.MIN_VALUE;
+                double minValue = Double.MAX_VALUE;
+                int timestamp = 0;
+                double maxPrecisionError = 0;
+                long totalSize = 32;
+                float totalBlocks = 0;
+                double totalStdev = 0D;
+                long encodingDuration = 0;
+                long decodingDuration = 0;
+                while ((values = timeseriesFileReader.nextBlock()) != null && totalBlocks < MINIMUM_TOTAL_BLOCKS) {
+                    List<Point> points = new ArrayList<>();
+                    for (Double value : values) {
+                        points.add(new Point(timestamp++, value.floatValue()));
+                    }
 
-	@Test
-	public void simpleTest() {
-	    BigDecimal first = new BigDecimal("62.3");
-	    BigDecimal last = new BigDecimal("63.8");
-	    int timeFirst = 1063638;
-	    int timeLast = 1063639;
-	    BigDecimal epsilon = new BigDecimal("0.25");
-	    LinearFunctionBigDecimal line = new LinearFunctionBigDecimal(timeFirst, first, timeLast, last.add(epsilon));
-	    System.out.println(line);
-	    System.out.println(line.get(timeLast));
-	    System.out.println(last.add(epsilon));
-	    System.out.println(last.add(epsilon).compareTo(line.get(timeLast)));
-//	    assertEquals(last, line.get(timeLast), epsilon, "Value did not match");
-	}
+                    long start = System.nanoTime();
+                    List<SwingSegment> constants = new SwingFilterDisjointQuantized().filter(points, epsilon);
+                    encodingDuration += System.nanoTime() - start;
 
+                    totalStdev += TimeseriesFileReader.sd(points.stream().map(l -> (float) l.getValue()).collect(Collectors.toList()));
+                    totalBlocks += 1;
+                    totalSize += constants.size() * ( 2 * 64 + 32);
+
+                    DecompressorSwingFilter d = new DecompressorSwingFilter(constants);
+                    for (Double value : values) {
+                        start = System.nanoTime();
+                        maxValue = value > maxValue ? value : maxValue;
+                        minValue = value < minValue ? value : minValue;
+                        Float decompressedValue = d.readValue();
+                        decodingDuration += System.nanoTime() - start;
+                        double precisionError = Math.abs(value.doubleValue() - decompressedValue);
+                        maxPrecisionError = (precisionError > maxPrecisionError) ? precisionError : maxPrecisionError;
+                        assertEquals(value.floatValue(), decompressedValue.floatValue(), epsilon + epsilon / 1000, "Value did not match");
+                    }
+                }
+                System.out.println(String.format(
+                        "SwingDQ: %s - Bits/value: %.2f, Compression time per block: %.2f, Decompression time per block: %.2f, Error: %.8f, STDEV: %.2f, Error/STDEV: %.2f, Range: %.2f (%.2f)",
+                        filename, totalSize / (totalBlocks * TimeseriesFileReader.DEFAULT_BLOCK_SIZE),
+                        encodingDuration / totalBlocks, decodingDuration / totalBlocks, maxPrecisionError, totalStdev / totalBlocks, maxPrecisionError / (totalStdev / totalBlocks), (maxValue - minValue), 100* maxPrecisionError / (maxValue - minValue)));
+
+            }
+        }
+    }
+*/
 
 }
