@@ -11,12 +11,6 @@ public class SwingSegment {
 		this.line = line;
 	}
 
-    public SwingSegment(long initialTimestamp, long finalTimestamp, float first, float last) {
-        this.initialTimestamp = initialTimestamp;
-        this.finalTimestamp = finalTimestamp;
-        this.line = new LinearFunction(initialTimestamp, first, finalTimestamp + 1, last);
-    }
-
 	public long getFinalTimestamp() {
 		return finalTimestamp;
 	}

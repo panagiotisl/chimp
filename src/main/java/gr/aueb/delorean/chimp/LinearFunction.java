@@ -24,6 +24,11 @@ public class LinearFunction {
         this.b = vs - a * ts;
     }
 
+    public LinearFunction(double a, double b) {
+        this.a = a;
+        this.b = b;
+    }
+
     /** Public Methods **/
     public double get(long ts) {
         return (this.a * ts + this.b);
