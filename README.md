@@ -3,7 +3,7 @@ Chimp: Efficient Lossless Floating Point Compression for Time Series Databases
 
 Code and reproducible tests executing Chimp and 10 earlier approaches for three data sets.
 
-Execute (Requires Java 8):
+Execute (Requires Java 9):
 
 ```
 mvn test
